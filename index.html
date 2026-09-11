@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Boda Rivas Terán - Ubicaciones</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root{
+      --vino:#4B232E;
+      --vino-claro:#6B3B48;
+      --hospedaje:#6F42C1;
+      --texto:#292929;
+      --fondo:#F7F4F2;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      width:100%;
+      min-height:100%;
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--texto);
+      background:var(--fondo);
+    }
+
+    .page{
+      width:100%;
+      max-width:900px;
+      margin:0 auto;
+      background:#fff;
+      min-height:100vh;
+    }
+
+    /* CAMBIA ESTA IMAGEN por tu encabezado final */
+    .hero{
+      width:100%;
+      aspect-ratio:16 / 7;
+      background:
+        linear-gradient(rgba(75,35,46,.08),rgba(75,35,46,.08)),
+        url('encabezado.jpg') center/cover no-repeat;
+      background-color:#e9e3e5;
+    }
+
+    .content{
+      padding:18px 14px 24px;
+    }
+
+    h1{
+      margin:0 0 14px;
+      text-align:center;
+      color:var(--vino);
+      font-size:24px;
+      font-weight:700;
+    }
+
+    .map-wrap{
+      width:100%;
+      position:relative;
+    }
+
+    #map{
+      width:100%;
+      height:62vh;
+      min-height:460px;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 4px 18px rgba(0,0,0,.08);
+      background:#e8e5df;
+    }
+
+    .legend{
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-top:14px;
+      font-size:14px;
+    }
+
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .dot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      display:inline-block;
+    }
+
+    .dot.ceremonia{background:var(--vino);}
+    .dot.recepcion{background:var(--vino-claro);}
+    .dot.hospedaje{background:var(--hospedaje);}
+
+    .place-label{
+      background:rgba(255,255,255,.96);
+      border:none;
+      box-shadow:0 1px 4px rgba(0,0,0,.18);
+      color:#222;
+      font-weight:700;
+      padding:4px 7px;
+      border-radius:6px;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .leaflet-tooltip-top:before{
+      border-top-color:rgba(255,255,255,.96);
+    }
+
+    .popup-title{
+      font-weight:700;
+      margin-bottom:8px;
+      color:var(--vino);
+    }
+
+    .maps-btn{
+      display:inline-block;
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius:8px;
+      background:var(--vino);
+      color:#fff !important;
+      text-decoration:none;
+      font-weight:700;
+      font-size:13px;
+    }
+
+    @media (max-width:600px){
+      #map{
+        height:64vh;
+        min-height:500px;
+      }
+      .content{padding:14px 10px 20px}
+      h1{font-size:21px}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- ==========================================================
+         ENCABEZADO
+         Reemplaza "encabezado.jpg" por el nombre de tu imagen.
+         ========================================================== -->
+    <div class="hero" aria-label="Encabezado Boda Rivas Terán"></div>
+
+    <section class="content">
+      <h1>Ubicaciones</h1>
+
+      <div class="map-wrap">
+        <div id="map"></div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="dot ceremonia"></span> Ceremonia</div>
+        <div class="legend-item"><span class="dot recepcion"></span> Recepción</div>
+        <div class="legend-item"><span class="dot hospedaje"></span> Hospedajes</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* ============================================================
+       AQUÍ CAMBIAS TODAS LAS UBICACIONES
+       ============================================================ */
+
+    const lugares = [
+      {
+        nombre: "Ceremonia",
+        lat: 0.234000,        // <-- CAMBIAR LATITUD
+        lng: -78.265000,      // <-- CAMBIAR LONGITUD
+        tipo: "ceremonia",
+        googleMapsUrl: ""     // <-- PEGA AQUÍ EL ENLACE DE GOOGLE MAPS
+      },
+      {
+        nombre: "Recepción",
+        lat: 0.228000,        // <-- CAMBIAR LATITUD
+        lng: -78.260000,      // <-- CAMBIAR LONGITUD
+        tipo: "recepcion",
+        googleMapsUrl: ""
+      },
+      {
+        nombre: "Hostería Cabañas del Lago",
+        lat: 0.215000,
+        lng: -78.205000,
+        tipo: "hospedaje",
+        googleMapsUrl: ""
+      },
+      {
+        nombre: "Hacienda Cusín",
+        lat: 0.195000,
+        lng: -78.190000,
+        tipo: "hospedaje",
+        googleMapsUrl: ""
+      },
+      {
+        nombre: "Hostería PuertoLago",
+        lat: 0.210000,
+        lng: -78.220000,
+        tipo: "hospedaje",
+        googleMapsUrl: ""
+      },
+      {
+        nombre: "Hotel Otavalo",
+        lat: 0.235000,
+        lng: -78.262000,
+        tipo: "hospedaje",
+        googleMapsUrl: ""
+      },
+      {
+        nombre: "Hacienda Pinsaquí",
+        lat: 0.270000,
+        lng: -78.285000,
+        tipo: "hospedaje",
+        googleMapsUrl: ""
+      },
+      {
+        nombre: "Hotel El Indio Inn",
+        lat: 0.233000,
+        lng: -78.263000,
+        tipo: "hospedaje",
+        googleMapsUrl: ""
+      }
+    ];
+
+    /* ============================================================
+       DESDE AQUÍ NO NECESITAS TOCAR NADA
+       ============================================================ */
+
+    const map = L.map('map', {
+      zoomControl: true,
+      attributionControl: true,
+      scrollWheelZoom: true,
+      preferCanvas: true
+    });
+
+    /*
+      CAMBIO IMPORTANTE:
+      uso un único servidor de tiles, sin {s}.
+      Esto evita algunos casos en los que el navegador carga
+      solo parte de los mosaicos.
+    */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      updateWhenIdle: false,
+      updateWhenZooming: false,
+      keepBuffer: 6,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const colores = {
+      ceremonia: '#4B232E',
+      recepcion: '#6B3B48',
+      hospedaje: '#6F42C1'
+    };
+
+    const bounds = [];
+
+    lugares.forEach(lugar => {
+      const marker = L.circleMarker([lugar.lat, lugar.lng], {
+        radius: 9,
+        color: '#ffffff',
+        weight: 2,
+        fillColor: colores[lugar.tipo],
+        fillOpacity: 1
+      }).addTo(map);
+
+      marker.bindTooltip(lugar.nombre, {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -10],
+        className: 'place-label'
+      });
+
+      const boton = lugar.googleMapsUrl
+        ? `<br><a class="maps-btn" href="${lugar.googleMapsUrl}" target="_blank" rel="noopener">Cómo llegar</a>`
+        : '';
+
+      marker.bindPopup(`
+        <div class="popup-title">${lugar.nombre}</div>
+        ${boton}
+      `);
+
+      bounds.push([lugar.lat, lugar.lng]);
+    });
+
+    function encuadrarMapa(){
+      if(bounds.length){
+        map.invalidateSize(true);
+        map.fitBounds(bounds, {
+          padding:[35,35],
+          maxZoom:13
+        });
+      }
+    }
+
+    /*
+      CORRECCIÓN PARA EL PROBLEMA DE "CUADROS BLANCOS":
+      Leaflet a veces calcula el tamaño antes de que el navegador
+      termine de dibujar el contenedor. Forzamos un recálculo.
+    */
+    window.addEventListener('load', () => {
+      encuadrarMapa();
+      setTimeout(encuadrarMapa, 250);
+      setTimeout(encuadrarMapa, 900);
+    });
+
+    window.addEventListener('resize', () => {
+      setTimeout(() => map.invalidateSize(true), 100);
+    });
+
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => {
+        map.invalidateSize(false);
+      });
+      ro.observe(document.getElementById('map'));
+    }
+
+    encuadrarMapa();
+  </script>
+</body>
+</html>
