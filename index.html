@@ -5,311 +5,438 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Boda Rivas Terán - Ubicaciones</title>
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIINfQ3yn5orG9tK1nqYz8VPaDdAN87Vh7A="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- MapLibre + puente Leaflet para OpenFreeMap -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
 
   <style>
     :root{
-      --ceremonia:#9ABEE3;
-      --recepcion:#8C79B5;
-      --hospedaje:#530F1E;
-      --texto:#292929;
-      --fondo:#F7F4F2;
-      --boton:#530F1E;
+      --color-ceremonia:#9ABEE3;
+      --color-recepcion:#8C79B5;
+      --color-hospedaje:#530F1E;
+      --color-texto:#2A2A2A;
+      --color-fondo:#F5F1EE;
+      --color-panel:#FFFFFF;
+      --color-borde:#E6DFDA;
+      --color-titulo:#530F1E;
+      --color-boton:#530F1E;
+      --color-boton-hover:#6B1A2A;
     }
 
     *{box-sizing:border-box}
 
     body{
       margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      color:var(--texto);
-      background:var(--fondo);
+      font-family: Arial, Helvetica, sans-serif;
+      color:var(--color-texto);
+      background:var(--color-fondo);
     }
 
     .page{
-      max-width:900px;
+      max-width:960px;
       margin:0 auto;
-      background:#fff;
+      background:var(--color-panel);
       min-height:100vh;
     }
 
+    /* ==========================================================
+       ENCABEZADO
+       Cambia "encabezado.jpg" por tu imagen final.
+       La imagen debe estar en la misma carpeta que este archivo.
+       ========================================================== */
     .hero{
       width:100%;
-      aspect-ratio:16 / 7;
+      aspect-ratio: 16 / 7;
       background:
-        linear-gradient(rgba(75,35,46,.08),rgba(75,35,46,.08)),
-        url('encabezado.jpg') center/cover no-repeat;
+        linear-gradient(rgba(255,255,255,.10), rgba(255,255,255,.10)),
+        url("encabezado_01.jpg") center / cover no-repeat;
+      border-bottom:1px solid var(--color-borde);
     }
 
     .content{
-      padding:18px 14px 24px;
+      padding:22px 18px 28px;
     }
 
     h1{
-      margin:0 0 12px;
+      margin:0 0 14px;
       text-align:center;
-      color:#530F1E;
-      font-size:24px;
+      color:var(--color-titulo);
+      font-size:26px;
+      line-height:1.1;
       font-weight:700;
     }
 
     .legend{
       display:flex;
       justify-content:center;
-      gap:16px;
+      align-items:center;
+      gap:18px;
       flex-wrap:wrap;
-      margin:0 0 14px;
+      margin:0 0 16px;
       font-size:14px;
     }
 
     .legend-item{
       display:flex;
       align-items:center;
-      gap:6px;
+      gap:7px;
     }
 
-    .dot{
-      width:12px;
-      height:12px;
+    .legend-dot{
+      width:14px;
+      height:14px;
       border-radius:50%;
       display:inline-block;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
     }
 
-    .dot.ceremonia{background:var(--ceremonia);}
-    .dot.recepcion{background:var(--recepcion);}
-    .dot.hospedaje{background:var(--hospedaje);}
+    .legend-dot.ceremonia{ background:var(--color-ceremonia); }
+    .legend-dot.recepcion{ background:var(--color-recepcion); }
+    .legend-dot.hospedaje{ background:var(--color-hospedaje); }
 
     #map{
       width:100%;
-      height:62vh;
-      min-height:460px;
-      border-radius:16px;
+      height:66vh;
+      min-height:520px;
+      border:1px solid var(--color-borde);
+      border-radius:22px;
       overflow:hidden;
-      box-shadow:0 4px 18px rgba(0,0,0,.08);
-      background:#ece8e5;
+      background:#ECE6E2;
+      box-shadow:0 5px 16px rgba(0,0,0,.06);
     }
 
-    .place-label{
-      background:rgba(255,255,255,.95);
+    /* Etiquetas visibles sobre cada punto */
+    .map-label{
+      background:rgba(255,255,255,.96);
       border:none;
-      box-shadow:0 1px 4px rgba(0,0,0,.18);
-      color:#222;
-      font-weight:700;
-      padding:4px 7px;
-      border-radius:6px;
+      border-radius:8px;
+      padding:5px 8px;
+      color:#242424;
       font-size:12px;
+      font-weight:700;
+      box-shadow:0 2px 6px rgba(0,0,0,.14);
       white-space:nowrap;
     }
 
+    /* Popup */
+    .leaflet-popup-content{
+      margin:12px !important;
+      min-width:230px;
+    }
+
+    .popup-card{
+      width:100%;
+    }
+
+    .popup-image{
+      width:100%;
+      height:118px;
+      object-fit:cover;
+      border-radius:12px;
+      display:block;
+      margin:0 0 10px;
+      background:#EFEAE6;
+    }
+
     .popup-title{
+      color:var(--color-titulo);
+      font-size:16px;
+      line-height:1.2;
       font-weight:700;
-      margin-bottom:8px;
-      color:#530F1E;
-      font-size:15px;
+      margin:0 0 6px;
     }
 
-    .website-btn{
-      display:inline-block;
-      margin-top:4px;
-      padding:8px 10px;
-      border-radius:8px;
-      background:var(--boton);
-      color:#fff !important;
-      text-decoration:none;
-      font-weight:700;
+    .popup-detail{
       font-size:13px;
+      line-height:1.45;
+      color:#4A4A4A;
+      margin:0 0 10px;
     }
 
-    @media (max-width:600px){
-      #map{
-        height:64vh;
-        min-height:500px;
+    .popup-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .popup-button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 12px;
+      border-radius:10px;
+      background:var(--color-boton);
+      color:#FFFFFF !important;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:700;
+      line-height:1;
+      transition:background .2s ease;
+    }
+
+    .popup-button:hover{
+      background:var(--color-boton-hover);
+    }
+
+    .popup-button.secondary{
+      background:#8C79B5;
+    }
+
+    .popup-button.secondary:hover{
+      background:#7864A3;
+    }
+
+    @media (max-width: 640px){
+      .content{
+        padding:18px 12px 22px;
       }
-      .content{padding:14px 10px 20px}
-      h1{font-size:21px}
+
+      h1{
+        font-size:24px;
+      }
+
       .legend{
         gap:12px;
         font-size:13px;
       }
+
+      #map{
+        height:68vh;
+        min-height:500px;
+        border-radius:18px;
+      }
+
+      .leaflet-popup-content{
+        min-width:210px;
+      }
+
+      .popup-image{
+        height:106px;
+      }
     }
   </style>
 </head>
-
 <body>
   <main class="page">
-
-    <!--
-      ENCABEZADO:
-      Reemplaza "encabezado.jpg" por el nombre de tu imagen final.
-      Debe estar en la misma carpeta que este archivo HTML.
-    -->
     <div class="hero" aria-label="Encabezado Boda Rivas Terán"></div>
 
     <section class="content">
       <h1>Ubicaciones</h1>
 
-      <div class="legend">
-        <div class="legend-item"><span class="dot ceremonia"></span> Ceremonia</div>
-        <div class="legend-item"><span class="dot recepcion"></span> Recepción</div>
-        <div class="legend-item"><span class="dot hospedaje"></span> Hospedajes</div>
+      <!-- Leyenda arriba del mapa -->
+      <div class="legend" aria-label="Categorías del mapa">
+        <div class="legend-item"><span class="legend-dot ceremonia"></span> Ceremonia</div>
+        <div class="legend-item"><span class="legend-dot recepcion"></span> Recepción</div>
+        <div class="legend-item"><span class="legend-dot hospedaje"></span> Hospedajes</div>
       </div>
 
-      <div id="map"></div>
+      <div id="map" aria-label="Mapa de ubicaciones"></div>
     </section>
   </main>
 
   <script>
-    /*
-      ============================================================
-      AQUÍ CAMBIAS TODAS LAS UBICACIONES
-      ============================================================
+    /* ============================================================
+       DATOS EDITABLES DEL MAPA
+       ============================================================
 
-      Para cada punto puedes modificar:
-      - nombre
-      - lat  = latitud
-      - lng  = longitud
-      - tipo = "ceremonia", "recepcion" o "hospedaje"
-      - sitioWeb = URL oficial del lugar
+       EN CADA UBICACIÓN PUEDES MODIFICAR:
 
-      Si sitioWeb queda vacío, no aparecerá el botón.
+       nombre          = Nombre visible del lugar
+       lat             = Latitud
+       lng             = Longitud
+       tipo            = "ceremonia" | "recepcion" | "hospedaje"
+       detalle         = Texto complementario (dirección, nota, referencia, etc.)
+       imagen          = URL o nombre de archivo de la imagen del lugar
+       sitioWeb        = Enlace del botón "Sitio web"
+       googleMapsUrl   = Enlace del botón "Cómo llegar"
+
+       IMPORTANTE:
+       - Si "imagen" está vacío, no se mostrará imagen en el popup.
+       - Si "sitioWeb" está vacío, no se mostrará el botón "Sitio web".
+       - Si "googleMapsUrl" está vacío, no se mostrará el botón "Cómo llegar".
+
+       Ejemplo:
+       {
+         nombre: "Basílica",
+         lat: -0.215000,
+         lng: -78.500000,
+         tipo: "ceremonia",
+         detalle: "Centro histórico de Quito",
+         imagen: "basilica.jpg",
+         sitioWeb: "https://www.ejemplo.com",
+         googleMapsUrl: "https://maps.google.com/?q=-0.215000,-78.500000"
+       }
     */
 
     const lugares = [
-
-      // ===== 1. CEREMONIA =====
       {
         nombre: "Ceremonia",
-        lat: 0.234000,        // <-- CAMBIAR LATITUD
-        lng: -78.265000,      // <-- CAMBIAR LONGITUD
+        lat: 0.234000,                 // <-- CAMBIAR LATITUD
+        lng: -78.265000,               // <-- CAMBIAR LONGITUD
         tipo: "ceremonia",
-        sitioWeb: ""          // <-- PEGAR AQUÍ EL SITIO WEB
+        detalle: "",                   // <-- OPCIONAL: dirección o información complementaria
+        imagen: "",                    // <-- OPCIONAL: imagen del lugar
+        sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
+        googleMapsUrl: ""              // <-- OPCIONAL: enlace de Google Maps
       },
-
-      // ===== 2. RECEPCIÓN =====
       {
         nombre: "Recepción",
-        lat: 0.228000,        // <-- CAMBIAR LATITUD
-        lng: -78.260000,      // <-- CAMBIAR LONGITUD
+        lat: 0.228000,
+        lng: -78.260000,
         tipo: "recepcion",
-        sitioWeb: ""          // <-- PEGAR AQUÍ EL SITIO WEB
+        detalle: "",
+        imagen: "",
+        sitioWeb: "",
+        googleMapsUrl: ""
       },
-
-      // ===== 3. HOSPEDAJES =====
       {
         nombre: "Hostería Cabañas del Lago",
-        lat: 0.215000,
-        lng: -78.205000,
+        lat: 0.2104962003018956,
+        lng: -78.21081507152952, 
         tipo: "hospedaje",
-        sitioWeb: ""
+        detalle: "",
+        imagen: "hospedaje_cabana-del-lago.jpg",
+        sitioWeb: "https://cabanasdellago.com.ec/",
+        googleMapsUrl: "https://maps.app.goo.gl/ydgtGhNCWg7Dg9pJ9"
       },
       {
         nombre: "Hacienda Cusín",
-        lat: 0.195000,
-        lng: -78.190000,
+        lat: 0.19233357531539888,
+        lng: -78.18740381887851, 
         tipo: "hospedaje",
-        sitioWeb: ""
+        detalle: "",
+        imagen: "hospedaje_hacienda-cusin.jpg",
+        sitioWeb: "https://www.haciendacusin.com/",
+        googleMapsUrl: "https://maps.app.goo.gl/Awdyc6VJ4Qx11S2v5"
       },
       {
         nombre: "Hostería PuertoLago",
-        lat: 0.210000,
-        lng: -78.220000,
-        tipo: "hospedaje",
-        sitioWeb: ""
+        lat: 0.20147294641812175,
+        lng: -78.23507666120643,
+        tipo: "hospedaje",  
+        detalle: "",
+        imagen: "hospedaje_puerto-lago.jpg",
+        sitioWeb: "https://www.puertolago.com/",
+        googleMapsUrl: "https://maps.app.goo.gl/SWKqVFBPCSXDHwJi9"
       },
       {
         nombre: "Hotel Otavalo",
-        lat: 0.235000,
-        lng: -78.262000,
-        tipo: "hospedaje",
-        sitioWeb: ""
+        lat: 0.225165888574998,
+        lng: -78.26290784771456,
+        tipo: "hospedaje",  
+        detalle: "",
+        imagen: "hospedaje_hotel-otavalo.jpg",
+        sitioWeb: "https://hotelotavalo.com/",
+        googleMapsUrl: "https://maps.app.goo.gl/AicHKQnxWUYbmqh48"
       },
       {
         nombre: "Hacienda Pinsaquí",
-        lat: 0.270000,
-        lng: -78.285000,
+        lat: 0.27932950259569195,
+        lng: -78.23818856305881,  
         tipo: "hospedaje",
-        sitioWeb: ""
+        detalle: "",
+        imagen: "hospedaje_Hacienda-Pinsaqui.jpg",
+        sitioWeb: "https://www.haciendapinsaqui.com/",
+        googleMapsUrl: "https://maps.app.goo.gl/MCdu2izUJ6G1uNtMA"
       },
       {
         nombre: "Hotel El Indio Inn",
-        lat: 0.233000,
-        lng: -78.263000,
+        lat: 0.22696217354341264,
+        lng: -78.26274160538667,  
         tipo: "hospedaje",
-        sitioWeb: ""
+        detalle: "",
+        imagen: "hospedaje_Indio-Inn.jpg",
+        sitioWeb: "https://www.hotelelindioinn.com/",
+        googleMapsUrl: "https://maps.app.goo.gl/fTpF7eZwthdfq8ty9"
       }
     ];
 
-    /* DESDE AQUÍ NO NECESITAS TOCAR NADA */
+    /* ============================================================
+       DESDE AQUÍ NO NECESITAS TOCAR NADA
+       ============================================================ */
 
-    const map = L.map('map', {
+    const COLORS = {
+      ceremonia: "#9ABEE3",
+      recepcion: "#8C79B5",
+      hospedaje: "#530F1E"
+    };
+
+    const map = L.map("map", {
       zoomControl: true,
       attributionControl: true,
       scrollWheelZoom: true
     });
 
-    /*
-      FONDO DEL MAPA:
-      Se usa OpenFreeMap para evitar el bloqueo 403 de los tiles
-      públicos de OpenStreetMap.
-    */
-    L.tileLayer(
-      'https://tiles.openfreemap.org/styles/liberty/{z}/{x}/{y}.png',
-      {
-        maxZoom: 19,
-        attribution:
-          '&copy; OpenStreetMap contributors &copy; OpenFreeMap'
-      }
-    ).addTo(map);
-
-    const colores = {
-      ceremonia: '#9ABEE3',
-      recepcion: '#8C79B5',
-      hospedaje: '#530F1E'
-    };
+    // OpenFreeMap con MapLibre (integración correcta)
+    L.maplibreGL({
+      style: "https://tiles.openfreemap.org/styles/liberty"
+    }).addTo(map);
 
     const bounds = [];
 
-    lugares.forEach(lugar => {
+    function buildPopupContent(lugar){
+      const imageHtml = lugar.imagen
+        ? `<img class="popup-image" src="${lugar.imagen}" alt="${lugar.nombre}">`
+        : "";
+
+      const detailHtml = lugar.detalle
+        ? `<p class="popup-detail">${lugar.detalle}</p>`
+        : "";
+
+      const websiteButton = lugar.sitioWeb
+        ? `<a class="popup-button" href="${lugar.sitioWeb}" target="_blank" rel="noopener noreferrer">Sitio web</a>`
+        : "";
+
+      const directionsButton = lugar.googleMapsUrl
+        ? `<a class="popup-button secondary" href="${lugar.googleMapsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`
+        : "";
+
+      const actionsHtml = (websiteButton || directionsButton)
+        ? `<div class="popup-actions">${websiteButton}${directionsButton}</div>`
+        : "";
+
+      return `
+        <div class="popup-card">
+          ${imageHtml}
+          <div class="popup-title">${lugar.nombre}</div>
+          ${detailHtml}
+          ${actionsHtml}
+        </div>
+      `;
+    }
+
+    lugares.forEach((lugar) => {
       const marker = L.circleMarker([lugar.lat, lugar.lng], {
         radius: 9,
-        color: '#ffffff',
+        color: "#FFFFFF",
         weight: 2,
-        fillColor: colores[lugar.tipo],
+        fillColor: COLORS[lugar.tipo] || "#530F1E",
         fillOpacity: 1
       }).addTo(map);
 
+      // Nombre siempre visible sobre el punto
       marker.bindTooltip(lugar.nombre, {
         permanent: true,
-        direction: 'top',
-        offset: [0, -10],
-        className: 'place-label'
+        direction: "top",
+        offset: [0, -12],
+        className: "map-label"
       });
 
-      const botonSitioWeb = lugar.sitioWeb
-        ? `<br><a class="website-btn" href="${lugar.sitioWeb}" target="_blank" rel="noopener noreferrer">Sitio web</a>`
-        : '';
-
-      marker.bindPopup(`
-        <div class="popup-title">${lugar.nombre}</div>
-        ${botonSitioWeb}
-      `);
+      marker.bindPopup(buildPopupContent(lugar), {
+        maxWidth: 280
+      });
 
       bounds.push([lugar.lat, lugar.lng]);
     });
 
     if (bounds.length > 0) {
       map.fitBounds(bounds, {
-        padding: [35, 35],
+        padding: [36, 36],
         maxZoom: 13
       });
     } else {
