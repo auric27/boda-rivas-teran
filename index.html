@@ -285,15 +285,15 @@
 
     const lugares = [
       {
-        nombre: "",
-        lat: 0.234000,                 // <-- CAMBIAR LATITUD
-        lng: -78.265000,               // <-- CAMBIAR LONGITUD
+        nombre: "Ceremonia",
+        lat: -0.2921107695549037,                 // <-- CAMBIAR LATITUD
+        lng: -78.40003072513117 ,               // <-- CAMBIAR LONGITUD
         tipo: "ceremonia",
         detalle: "",                   // <-- OPCIONAL: dirección o información complementaria
-        imagen: "",                    // <-- OPCIONAL: imagen del lugar
+        imagen: "ceremonia_iglesia.jpg",                    // <-- OPCIONAL: imagen del lugar
         sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
-        googleMapsLugar: "",
-        googlePlaceId: ""              // <-- OPCIONAL: enlace de Google Maps
+        googleMapsLugar: "https://maps.app.goo.gl/LUhUFwohQTmNM2cUA",
+        googlePlaceId: "ChIJQQdXBwATKo4RypZrYVF5DcY 6Q7Q+RG, San Rafael de la Laguna, Ecuador"              // <-- OPCIONAL: enlace de Google Maps
       },
       {
         nombre: "Recepción",
@@ -303,7 +303,7 @@
         detalle: "",
         imagen: "recepción_hosteria-villa-mimi.jpg",
         sitioWeb: "https://hosteriavillamimi.com/",
-        googleMapsLugar: "https://maps.app.goo.gl/pENHbVJdFRTDdcWs6?g_st=iw",
+        googleMapsLugar: "https://maps.app.goo.gl/t4Aeo94YiLqBmhwu9",
         googlePlaceId: "ChIJFVC8KJETKo4RFRfnRoZLA5E Provincia de, 6Q9H+VFF, Eugenio Espejo, Ecuador"
       },
       {
@@ -371,7 +371,22 @@
         sitioWeb: "https://www.hotelelindioinn.com/",
         googleMapsLugar: "https://maps.app.goo.gl/fTpF7eZwthdfq8ty9",
         googlePlaceId: "ChIJWxyLnJYUKo4R7ZUSK4N4Yik Principal, C. Bolívar y Abdon Calderon, 100450 Otavalo, Ecuador"
+      },
+      {
+        nombre: "Hotel Medina del Lago",
+        lat: 0.1939396853389929,                       // <-- AGREGAR LATITUD
+        lng: -78.17800031402014,                       // <-- AGREGAR LONGITUD
+        tipo: "hospedaje",
+        detalle: "",                    // <-- OPCIONAL
+        imagen: "hospedaje_Medina-del-lago.jpg",                     // <-- EJEMPLO: hospedaje_hosteria-01.jpg
+        sitioWeb: "https://medinadellago.com/",                   // <-- SITIO WEB OFICIAL
+        googleMapsLugar: "https://maps.app.goo.gl/xR1x8gJmbSfuHXEw8",            // <-- ENLACE OFICIAL/COMPARTIDO DE GOOGLE MAPS
+        googlePlaceId: "ChIJ1deTcW0RKo4RWRQoMAamHUs Colina de San Pablo lote 26 A, San Pablo del Lago, Ecuador"               // <-- PLACE ID OFICIAL (OPCIONAL)
       }
+
+
+
+
     ];
 
     /* ============================================================
@@ -459,7 +474,17 @@
     }
 
     lugares.forEach((lugar) => {
-      const marker = L.circleMarker([lugar.lat, lugar.lng], {
+      // Si todavía no has ingresado coordenadas, el lugar queda guardado
+      // en el HTML pero no se dibuja en el mapa hasta completarlas.
+      const tieneCoordenadas =
+        lugar.lat !== null && lugar.lat !== "" &&
+        lugar.lng !== null && lugar.lng !== "" &&
+        Number.isFinite(Number(lugar.lat)) &&
+        Number.isFinite(Number(lugar.lng));
+
+      if (!tieneCoordenadas) return;
+
+      const marker = L.circleMarker([Number(lugar.lat), Number(lugar.lng)], {
         radius: 9,
         color: "#FFFFFF",
         weight: 2,
