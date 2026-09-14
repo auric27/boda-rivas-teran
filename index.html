@@ -244,6 +244,12 @@
        DATOS EDITABLES DEL MAPA
        ============================================================
 
+       NOTA SOBRE GOOGLE MAPS:
+       - lat/lng siguen siendo necesarios únicamente para colocar el pin en ESTE mapa.
+       - No se usan para la ruta cuando existe googlePlaceId.
+       - Para ruta directa al negocio oficial, completa googlePlaceId.
+       - googleMapsLugar puede ser el enlace oficial corto de Google Maps.
+
        EN CADA UBICACIÓN PUEDES MODIFICAR:
 
        nombre          = Nombre visible del lugar
@@ -253,10 +259,15 @@
        detalle         = Texto complementario (dirección, nota, referencia, etc.)
        imagen          = URL o nombre de archivo de la imagen del lugar
        sitioWeb        = Enlace del botón "Sitio web"
+       googleMapsLugar = Enlace oficial/compartido de Google Maps del lugar
+       googlePlaceId   = Place ID oficial de Google (opcional, recomendado para ruta directa)
 
        IMPORTANTE:
        - Si "imagen" está vacío, no se mostrará imagen en el popup.
        - Si "sitioWeb" está vacío, no se mostrará el botón "Sitio web".
+       - Si "googlePlaceId" existe, "Cómo llegar" abre la ruta directa al establecimiento oficial.
+       - Si solo existe "googleMapsLugar", se abre la ficha oficial de Google Maps.
+       - Si faltan ambos, se usan lat/lng como último recurso para la ruta.
 
        Ejemplo:
        {
@@ -267,6 +278,8 @@
          detalle: "Centro histórico de Quito",
          imagen: "basilica.jpg",
          sitioWeb: "https://www.ejemplo.com",
+         googleMapsLugar: "https://maps.app.goo.gl/XXXXXXXXXXXX",
+         googlePlaceId: "ChIJXXXXXXXXXXXX"
        }
     */
 
@@ -279,6 +292,8 @@
         detalle: "Falta incluir dirección",                   // <-- OPCIONAL: dirección o información complementaria
         imagen: "",                    // <-- OPCIONAL: imagen del lugar
         sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
+        googleMapsLugar: "",
+        googlePlaceId: ""              // <-- OPCIONAL: enlace de Google Maps
       },
       {
         nombre: "Recepción",
@@ -287,7 +302,10 @@
         tipo: "recepcion",
         detalle: "Falta incluir dirección",
         imagen: "",
-        sitioWeb: "",},
+        sitioWeb: "",
+        googleMapsLugar: "",
+        googlePlaceId: ""
+      },
       {
         nombre: "Hostería Cabañas del Lago",
         lat: 0.2104962003018956,
@@ -295,7 +313,10 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_cabana-del-lago.jpg",
-        sitioWeb: "https://cabanasdellago.com.ec/",},
+        sitioWeb: "https://cabanasdellago.com.ec/",
+        googleMapsLugar: "https://maps.app.goo.gl/ydgtGhNCWg7Dg9pJ9",
+        googlePlaceId: "ChIJUfcltPoTKo4Ro6cxmGcPbFQ Orillas del Lago San Pablo, Av. 10 de Agosto, Otavalo, Ecuador"
+      },
       {
         nombre: "Hacienda Cusín",
         lat: 0.19233357531539888,
@@ -303,7 +324,10 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_hacienda-cusin.jpg",
-        sitioWeb: "https://www.haciendacusin.com/",},
+        sitioWeb: "https://www.haciendacusin.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/kVK1FoCDvYkgHsL1A",
+        googlePlaceId: "ChIJWxyLnJYUKo4RLCaLNeFQbKc Calle Chiriboga s/n, 100210 San Pablo del Lago, Ecuador"
+      },
       {
         nombre: "Hostería PuertoLago",
         lat: 0.20147294641812175,
@@ -311,7 +335,10 @@
         tipo: "hospedaje",  
         detalle: "",
         imagen: "hospedaje_puerto-lago.jpg",
-        sitioWeb: "https://www.puertolago.com/",},
+        sitioWeb: "https://www.puertolago.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/SWKqVFBPCSXDHwJi9",
+        googlePlaceId: "ChIJyx5WiJcTKo4ROoVarioxT0Y Lago San Pablo Km 5 Sur, Otavalo, Ecuador"
+      },
       {
         nombre: "Hotel Otavalo",
         lat: 0.225165888574998,
@@ -319,7 +346,10 @@
         tipo: "hospedaje",  
         detalle: "",
         imagen: "hospedaje_hotel-otavalo.jpg",
-        sitioWeb: "https://hotelotavalo.com/",},
+        sitioWeb: "https://hotelotavalo.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/AicHKQnxWUYbmqh48",
+        googlePlaceId: "ChIJw9wZOWcVKo4RQtIEr705-bg C. Vicente Ramon Roca 504, Otavalo, Ecuador"
+      },
       {
         nombre: "Hacienda Pinsaquí",
         lat: 0.27932950259569195,
@@ -327,7 +357,10 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_Hacienda-Pinsaqui.jpg",
-        sitioWeb: "https://www.haciendapinsaqui.com/",},
+        sitioWeb: "https://www.haciendapinsaqui.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/MCdu2izUJ6G1uNtMA",
+        googlePlaceId: "ChIJSU-FnJYUKo4RmknYusg6jcc Panamericana Norte km 5 Pinsaqui, 100150 Otavalo, Ecuador"
+      },
       {
         nombre: "Hotel El Indio Inn",
         lat: 0.22696217354341264,
@@ -335,7 +368,10 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_Indio-Inn.jpg",
-        sitioWeb: "https://www.hotelelindioinn.com/",}
+        sitioWeb: "https://www.hotelelindioinn.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/fTpF7eZwthdfq8ty9",
+        googlePlaceId: "ChIJWxyLnJYUKo4R7ZUSK4N4Yik Principal, C. Bolívar y Abdon Calderon, 100450 Otavalo, Ecuador"
+      }
     ];
 
     /* ============================================================
@@ -374,14 +410,42 @@
         ? `<a class="popup-button" href="${lugar.sitioWeb}" target="_blank" rel="noopener noreferrer">Sitio web</a>`
         : "";
 
-      const googleDirectionsUrl =
-        `https://www.google.com/maps/dir/?api=1&destination=${lugar.lat},${lugar.lng}`;
+      /*
+        DESTINO EN GOOGLE MAPS
+        1) googlePlaceId: abre DIRECCIONES al establecimiento oficial.
+        2) googleMapsLugar: abre la FICHA oficial del lugar.
+        3) Sin los anteriores: usa lat/lng como ruta de respaldo.
 
-      const directionsButton =
-        `<a class="popup-button secondary" href="${googleDirectionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
+        Importante: un enlace corto maps.app.goo.gl identifica el lugar,
+        pero por sí solo no contiene un Place ID utilizable por la API
+        de URLs de Google Maps para forzar la pantalla de direcciones.
+      */
+      let mapsButton = "";
 
-      const actionsHtml = (websiteButton || directionsButton)
-        ? `<div class="popup-actions">${websiteButton}${directionsButton}</div>`
+      if (lugar.googlePlaceId) {
+        const directionsUrl =
+          `https://www.google.com/maps/dir/?api=1` +
+          `&destination=${encodeURIComponent(lugar.nombre)}` +
+          `&destination_place_id=${encodeURIComponent(lugar.googlePlaceId)}`;
+
+        mapsButton =
+          `<a class="popup-button secondary" href="${directionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
+
+      } else if (lugar.googleMapsLugar) {
+        mapsButton =
+          `<a class="popup-button secondary" href="${lugar.googleMapsLugar}" target="_blank" rel="noopener noreferrer">Ver en Google Maps</a>`;
+
+      } else if (Number.isFinite(Number(lugar.lat)) && Number.isFinite(Number(lugar.lng))) {
+        const fallbackDirectionsUrl =
+          `https://www.google.com/maps/dir/?api=1` +
+          `&destination=${encodeURIComponent(`${lugar.lat},${lugar.lng}`)}`;
+
+        mapsButton =
+          `<a class="popup-button secondary" href="${fallbackDirectionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
+      }
+
+      const actionsHtml = (websiteButton || mapsButton)
+        ? `<div class="popup-actions">${websiteButton}${mapsButton}</div>`
         : "";
 
       return `
