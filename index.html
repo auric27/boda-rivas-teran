@@ -66,6 +66,7 @@
       margin:0 0 14px;
       text-align:center;
       color:var(--color-titulo);
+      font-family: Georgia, "Times New Roman", Times, serif;
       font-size:26px;
       line-height:1.1;
       font-weight:700;
@@ -78,6 +79,7 @@
       gap:18px;
       flex-wrap:wrap;
       margin:0 0 16px;
+      font-family: Georgia, "Times New Roman", Times, serif;
       font-size:14px;
     }
 
@@ -112,21 +114,60 @@
 
     /* Etiquetas visibles sobre cada punto */
     .map-label{
-      background:rgba(255,255,255,.96);
       border:none;
       border-radius:8px;
-      padding:5px 8px;
-      color:#242424;
-      font-size:12px;
+      white-space:nowrap;
       font-weight:700;
       box-shadow:0 2px 6px rgba(0,0,0,.14);
-      white-space:nowrap;
+    }
+
+    .map-label-hospedaje{
+      background:rgba(255,255,255,.96);
+      color:#242424;
+      padding:5px 8px;
+      font-size:12px;
+    }
+
+    .map-label-ceremonia{
+      background:var(--color-ceremonia);
+      color:#1F2A36;
+      padding:9px 14px;
+      font-size:24px;
+      line-height:1.1;
+      font-weight:800;
+      border-radius:11px;
+      box-shadow:0 3px 10px rgba(0,0,0,.20);
+    }
+
+    .map-label-recepcion{
+      background:var(--color-recepcion);
+      color:#FFFFFF;
+      padding:9px 14px;
+      font-size:24px;
+      line-height:1.1;
+      font-weight:800;
+      border-radius:11px;
+      box-shadow:0 3px 10px rgba(0,0,0,.20);
+    }
+
+    .leaflet-tooltip.map-label-ceremonia:before,
+    .leaflet-tooltip.map-label-recepcion:before,
+    .leaflet-tooltip.map-label-hospedaje:before{
+      display:none;
     }
 
     /* Popup */
     .leaflet-popup-content{
       margin:12px !important;
       min-width:230px;
+    }
+
+    .leaflet-popup{
+      z-index:1200 !important;
+    }
+
+    .leaflet-popup-pane{
+      z-index:1200 !important;
     }
 
     .popup-card{
@@ -218,6 +259,17 @@
       .popup-image{
         height:106px;
       }
+
+      .map-label-ceremonia,
+      .map-label-recepcion{
+        font-size:20px;
+        padding:8px 12px;
+      }
+
+      .map-label-hospedaje{
+        font-size:11px;
+        padding:4px 7px;
+      }
     }
   </style>
 </head>
@@ -289,7 +341,7 @@
         lat: 0.2153140613540771,                 // <-- CAMBIAR LATITUD
         lng: -78.21097815249018,                // <-- CAMBIAR LONGITUD
         tipo: "ceremonia",
-        detalle: "",                   // <-- OPCIONAL: dirección o información complementaria
+        detalle: "Capilla Católica Nuestra Señora de La Merced | Camuendo",                   // <-- OPCIONAL: dirección o información complementaria
         imagen: "ceremonia_iglesia.jpg",                    // <-- OPCIONAL: imagen del lugar
         sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
         googleMapsLugar: "https://maps.app.goo.gl/48dA4XWfeN6auj636",
@@ -300,7 +352,7 @@
         lat: 0.21985878886778432,
         lng: -78.22125092698361,  
         tipo: "recepcion",
-        detalle: "",
+        detalle: "Hosteria Villa Mimi",
         imagen: "recepción_hosteria-villa-mimi.jpg",
         sitioWeb: "https://hosteriavillamimi.com/",
         googleMapsLugar: "https://maps.app.goo.gl/t4Aeo94YiLqBmhwu9",
@@ -410,6 +462,23 @@
       style: "https://tiles.openfreemap.org/styles/liberty"
     }).addTo(map);
 
+    map.createPane("hospedajePane");
+    map.getPane("hospedajePane").style.zIndex = 450;
+
+    map.createPane("principalPane");
+    map.getPane("principalPane").style.zIndex = 650;
+
+    map.createPane("tooltipHospedajePane");
+    map.getPane("tooltipHospedajePane").style.zIndex = 650;
+    map.getPane("tooltipHospedajePane").style.pointerEvents = "none";
+
+    map.createPane("tooltipPrincipalPane");
+    map.getPane("tooltipPrincipalPane").style.zIndex = 900;
+    map.getPane("tooltipPrincipalPane").style.pointerEvents = "none";
+
+    // Asegura que los popups siempre queden por encima de etiquetas y pines.
+    map.getPane("popupPane").style.zIndex = 1200;
+
     const bounds = [];
 
     function buildPopupContent(lugar){
@@ -490,20 +559,30 @@
 
       if (!tieneCoordenadas) return;
 
+      const esPrincipal = lugar.tipo === "ceremonia" || lugar.tipo === "recepcion";
+
       const marker = L.circleMarker([Number(lugar.lat), Number(lugar.lng)], {
-        radius: 9,
+        pane: esPrincipal ? "principalPane" : "hospedajePane",
+        radius: esPrincipal ? 11 : 9,
         color: "#FFFFFF",
-        weight: 2,
+        weight: esPrincipal ? 3 : 2,
         fillColor: COLORS[lugar.tipo] || "#530F1E",
         fillOpacity: 1
       }).addTo(map);
 
-      // Nombre siempre visible sobre el punto
+      const claseEtiqueta =
+        lugar.tipo === "ceremonia"
+          ? "map-label map-label-ceremonia"
+          : lugar.tipo === "recepcion"
+            ? "map-label map-label-recepcion"
+            : "map-label map-label-hospedaje";
+
       marker.bindTooltip(lugar.nombre, {
         permanent: true,
         direction: "top",
-        offset: [0, -12],
-        className: "map-label"
+        offset: esPrincipal ? [0, -16] : [0, -12],
+        className: claseEtiqueta,
+        pane: esPrincipal ? "tooltipPrincipalPane" : "tooltipHospedajePane"
       });
 
       marker.bindPopup(buildPopupContent(lugar), {
