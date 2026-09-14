@@ -260,7 +260,7 @@
        imagen          = URL o nombre de archivo de la imagen del lugar
        sitioWeb        = Enlace del botón "Sitio web"
        googleMapsLugar = Enlace oficial/compartido de Google Maps del lugar
-       googlePlaceId   = Place ID oficial de Google (opcional, recomendado para ruta directa)
+       googlePlaceId   = SOLO el Place ID oficial de Google, por ejemplo: "ChIJxxxxxxxxxxxx" (sin dirección)
 
        IMPORTANTE:
        - Si "imagen" está vacío, no se mostrará imagen en el popup.
@@ -293,7 +293,7 @@
         imagen: "ceremonia_iglesia.jpg",                    // <-- OPCIONAL: imagen del lugar
         sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
         googleMapsLugar: "https://maps.app.goo.gl/LUhUFwohQTmNM2cUA",
-        googlePlaceId: "ChIJQQdXBwATKo4RypZrYVF5DcY 6Q7Q+RG, San Rafael de la Laguna, Ecuador"              // <-- OPCIONAL: enlace de Google Maps
+        googlePlaceId: "ChIJQQdXBwATKo4RypZrYVF5DcY"              // <-- OPCIONAL: enlace de Google Maps
       },
       {
         nombre: "Recepción",
@@ -304,7 +304,7 @@
         imagen: "recepción_hosteria-villa-mimi.jpg",
         sitioWeb: "https://hosteriavillamimi.com/",
         googleMapsLugar: "https://maps.app.goo.gl/t4Aeo94YiLqBmhwu9",
-        googlePlaceId: "ChIJFVC8KJETKo4RFRfnRoZLA5E Provincia de, 6Q9H+VFF, Eugenio Espejo, Ecuador"
+        googlePlaceId: "ChIJFVC8KJETKo4RFRfnRoZLA5E"
       },
       {
         nombre: "Hostería Cabañas del Lago",
@@ -315,7 +315,7 @@
         imagen: "hospedaje_cabana-del-lago.jpg",
         sitioWeb: "https://cabanasdellago.com.ec/",
         googleMapsLugar: "https://maps.app.goo.gl/ydgtGhNCWg7Dg9pJ9",
-        googlePlaceId: "ChIJUfcltPoTKo4Ro6cxmGcPbFQ Orillas del Lago San Pablo, Av. 10 de Agosto, Otavalo, Ecuador"
+        googlePlaceId: "ChIJUfcltPoTKo4Ro6cxmGcPbFQ"
       },
       {
         nombre: "Hacienda Cusín",
@@ -326,7 +326,7 @@
         imagen: "hospedaje_hacienda-cusin.jpg",
         sitioWeb: "https://www.haciendacusin.com/",
         googleMapsLugar: "https://maps.app.goo.gl/kVK1FoCDvYkgHsL1A",
-        googlePlaceId: "ChIJWxyLnJYUKo4RLCaLNeFQbKc Calle Chiriboga s/n, 100210 San Pablo del Lago, Ecuador"
+        googlePlaceId: "ChIJWxyLnJYUKo4RLCaLNeFQbKc"
       },
       {
         nombre: "Hostería PuertoLago",
@@ -337,7 +337,7 @@
         imagen: "hospedaje_puerto-lago.jpg",
         sitioWeb: "https://www.puertolago.com/",
         googleMapsLugar: "https://maps.app.goo.gl/SWKqVFBPCSXDHwJi9",
-        googlePlaceId: "ChIJyx5WiJcTKo4ROoVarioxT0Y Lago San Pablo Km 5 Sur, Otavalo, Ecuador"
+        googlePlaceId: "ChIJyx5WiJcTKo4ROoVarioxT0Y"
       },
       {
         nombre: "Hotel Otavalo",
@@ -348,7 +348,7 @@
         imagen: "hospedaje_hotel-otavalo.jpg",
         sitioWeb: "https://hotelotavalo.com/",
         googleMapsLugar: "https://maps.app.goo.gl/AicHKQnxWUYbmqh48",
-        googlePlaceId: "ChIJw9wZOWcVKo4RQtIEr705-bg C. Vicente Ramon Roca 504, Otavalo, Ecuador"
+        googlePlaceId: "ChIJw9wZOWcVKo4RQtIEr705-bg"
       },
       {
         nombre: "Hacienda Pinsaquí",
@@ -359,7 +359,7 @@
         imagen: "hospedaje_Hacienda-Pinsaqui.jpg",
         sitioWeb: "https://www.haciendapinsaqui.com/",
         googleMapsLugar: "https://maps.app.goo.gl/MCdu2izUJ6G1uNtMA",
-        googlePlaceId: "ChIJSU-FnJYUKo4RmknYusg6jcc Panamericana Norte km 5 Pinsaqui, 100150 Otavalo, Ecuador"
+        googlePlaceId: "ChIJSU-FnJYUKo4RmknYusg6jcc"
       },
       {
         nombre: "Hotel El Indio Inn",
@@ -370,7 +370,7 @@
         imagen: "hospedaje_Indio-Inn.jpg",
         sitioWeb: "https://www.hotelelindioinn.com/",
         googleMapsLugar: "https://maps.app.goo.gl/fTpF7eZwthdfq8ty9",
-        googlePlaceId: "ChIJWxyLnJYUKo4R7ZUSK4N4Yik Principal, C. Bolívar y Abdon Calderon, 100450 Otavalo, Ecuador"
+        googlePlaceId: "ChIJWxyLnJYUKo4R7ZUSK4N4Yik"
       },
       {
         nombre: "Hotel Medina del Lago",
@@ -381,7 +381,7 @@
         imagen: "hospedaje_Medina-del-lago.jpg",                     // <-- EJEMPLO: hospedaje_hosteria-01.jpg
         sitioWeb: "https://medinadellago.com/",                   // <-- SITIO WEB OFICIAL
         googleMapsLugar: "https://maps.app.goo.gl/xR1x8gJmbSfuHXEw8",            // <-- ENLACE OFICIAL/COMPARTIDO DE GOOGLE MAPS
-        googlePlaceId: "ChIJ1deTcW0RKo4RWRQoMAamHUs Colina de San Pablo lote 26 A, San Pablo del Lago, Ecuador"               // <-- PLACE ID OFICIAL (OPCIONAL)
+        googlePlaceId: "ChIJ1deTcW0RKo4RWRQoMAamHUs"               // <-- PLACE ID OFICIAL (OPCIONAL)
       }
 
 
@@ -438,10 +438,16 @@
       let mapsButton = "";
 
       if (lugar.googlePlaceId) {
+        /*
+          Acepta únicamente la parte real del Place ID.
+          Si accidentalmente se pegó "ChIJ... dirección...", conserva solo "ChIJ...".
+        */
+        const placeIdLimpio = String(lugar.googlePlaceId).trim().split(/\\s+/)[0];
+
         const directionsUrl =
           `https://www.google.com/maps/dir/?api=1` +
           `&destination=${encodeURIComponent(lugar.nombre)}` +
-          `&destination_place_id=${encodeURIComponent(lugar.googlePlaceId)}`;
+          `&destination_place_id=${encodeURIComponent(placeIdLimpio)}`;
 
         mapsButton =
           `<a class="popup-button secondary" href="${directionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
