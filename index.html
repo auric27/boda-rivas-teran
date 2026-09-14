@@ -253,12 +253,10 @@
        detalle         = Texto complementario (dirección, nota, referencia, etc.)
        imagen          = URL o nombre de archivo de la imagen del lugar
        sitioWeb        = Enlace del botón "Sitio web"
-       googleMapsUrl   = Enlace del botón "Cómo llegar"
 
        IMPORTANTE:
        - Si "imagen" está vacío, no se mostrará imagen en el popup.
        - Si "sitioWeb" está vacío, no se mostrará el botón "Sitio web".
-       - Si "googleMapsUrl" está vacío, no se mostrará el botón "Cómo llegar".
 
        Ejemplo:
        {
@@ -269,7 +267,6 @@
          detalle: "Centro histórico de Quito",
          imagen: "basilica.jpg",
          sitioWeb: "https://www.ejemplo.com",
-         googleMapsUrl: "https://maps.google.com/?q=-0.215000,-78.500000"
        }
     */
 
@@ -279,21 +276,18 @@
         lat: 0.234000,                 // <-- CAMBIAR LATITUD
         lng: -78.265000,               // <-- CAMBIAR LONGITUD
         tipo: "ceremonia",
-        detalle: "",                   // <-- OPCIONAL: dirección o información complementaria
+        detalle: "Falta incluir dirección",                   // <-- OPCIONAL: dirección o información complementaria
         imagen: "",                    // <-- OPCIONAL: imagen del lugar
         sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
-        googleMapsUrl: ""              // <-- OPCIONAL: enlace de Google Maps
       },
       {
         nombre: "Recepción",
         lat: 0.228000,
         lng: -78.260000,
         tipo: "recepcion",
-        detalle: "",
+        detalle: "Falta incluir dirección",
         imagen: "",
-        sitioWeb: "",
-        googleMapsUrl: ""
-      },
+        sitioWeb: "",},
       {
         nombre: "Hostería Cabañas del Lago",
         lat: 0.2104962003018956,
@@ -301,9 +295,7 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_cabana-del-lago.jpg",
-        sitioWeb: "https://cabanasdellago.com.ec/",
-        googleMapsUrl: "https://maps.app.goo.gl/ydgtGhNCWg7Dg9pJ9"
-      },
+        sitioWeb: "https://cabanasdellago.com.ec/",},
       {
         nombre: "Hacienda Cusín",
         lat: 0.19233357531539888,
@@ -311,9 +303,7 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_hacienda-cusin.jpg",
-        sitioWeb: "https://www.haciendacusin.com/",
-        googleMapsUrl: "https://maps.app.goo.gl/Awdyc6VJ4Qx11S2v5"
-      },
+        sitioWeb: "https://www.haciendacusin.com/",},
       {
         nombre: "Hostería PuertoLago",
         lat: 0.20147294641812175,
@@ -321,9 +311,7 @@
         tipo: "hospedaje",  
         detalle: "",
         imagen: "hospedaje_puerto-lago.jpg",
-        sitioWeb: "https://www.puertolago.com/",
-        googleMapsUrl: "https://maps.app.goo.gl/SWKqVFBPCSXDHwJi9"
-      },
+        sitioWeb: "https://www.puertolago.com/",},
       {
         nombre: "Hotel Otavalo",
         lat: 0.225165888574998,
@@ -331,9 +319,7 @@
         tipo: "hospedaje",  
         detalle: "",
         imagen: "hospedaje_hotel-otavalo.jpg",
-        sitioWeb: "https://hotelotavalo.com/",
-        googleMapsUrl: "https://maps.app.goo.gl/AicHKQnxWUYbmqh48"
-      },
+        sitioWeb: "https://hotelotavalo.com/",},
       {
         nombre: "Hacienda Pinsaquí",
         lat: 0.27932950259569195,
@@ -341,9 +327,7 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_Hacienda-Pinsaqui.jpg",
-        sitioWeb: "https://www.haciendapinsaqui.com/",
-        googleMapsUrl: "https://maps.app.goo.gl/MCdu2izUJ6G1uNtMA"
-      },
+        sitioWeb: "https://www.haciendapinsaqui.com/",},
       {
         nombre: "Hotel El Indio Inn",
         lat: 0.22696217354341264,
@@ -351,9 +335,7 @@
         tipo: "hospedaje",
         detalle: "",
         imagen: "hospedaje_Indio-Inn.jpg",
-        sitioWeb: "https://www.hotelelindioinn.com/",
-        googleMapsUrl: "https://maps.app.goo.gl/fTpF7eZwthdfq8ty9"
-      }
+        sitioWeb: "https://www.hotelelindioinn.com/",}
     ];
 
     /* ============================================================
@@ -392,9 +374,11 @@
         ? `<a class="popup-button" href="${lugar.sitioWeb}" target="_blank" rel="noopener noreferrer">Sitio web</a>`
         : "";
 
-      const directionsButton = lugar.googleMapsUrl
-        ? `<a class="popup-button secondary" href="${lugar.googleMapsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`
-        : "";
+      const googleDirectionsUrl =
+        `https://www.google.com/maps/dir/?api=1&destination=${lugar.lat},${lugar.lng}`;
+
+      const directionsButton =
+        `<a class="popup-button secondary" href="${googleDirectionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
 
       const actionsHtml = (websiteButton || directionsButton)
         ? `<div class="popup-actions">${websiteButton}${directionsButton}</div>`
