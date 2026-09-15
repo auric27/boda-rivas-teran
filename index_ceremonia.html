@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Boda Rivas Terán - Ubicaciones</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- MapLibre + puente Leaflet para OpenFreeMap -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+
+  <style>
+    :root{
+      --color-ceremonia:#9ABEE3;
+      --color-recepcion:#8C79B5;
+      --color-hospedaje:#530F1E;
+      --color-texto:#2A2A2A;
+      --color-fondo:#F5F1EE;
+      --color-panel:#FFFFFF;
+      --color-borde:#E6DFDA;
+      --color-titulo:#530F1E;
+      --color-boton:#530F1E;
+      --color-boton-hover:#6B1A2A;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      color:var(--color-texto);
+      background:var(--color-fondo);
+    }
+
+    .page{
+      max-width:960px;
+      margin:0 auto;
+      background:var(--color-panel);
+      min-height:100vh;
+    }
+
+    /* ==========================================================
+       ENCABEZADO
+       Cambia "encabezado.jpg" por tu imagen final.
+       La imagen debe estar en la misma carpeta que este archivo.
+       ========================================================== */
+    .hero{
+      width:100%;
+      aspect-ratio: 16 / 7;
+      background:
+        linear-gradient(rgba(255,255,255,.10), rgba(255,255,255,.10)),
+        url("encabezado_01.jpg") center / cover no-repeat;
+      border-bottom:1px solid var(--color-borde);
+    }
+
+    .content{
+      padding:22px 18px 28px;
+    }
+
+    h1{
+      margin:0 0 14px;
+      text-align:center;
+      color:var(--color-titulo);
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size:26px;
+      line-height:1.1;
+      font-weight:700;
+    }
+
+    .legend{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+      margin:0 0 16px;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size:14px;
+    }
+
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:7px;
+    }
+
+    .legend-dot{
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      display:inline-block;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+    }
+
+    .legend-dot.ceremonia{ background:var(--color-ceremonia); }
+    .legend-dot.recepcion{ background:var(--color-recepcion); }
+    .legend-dot.hospedaje{ background:var(--color-hospedaje); }
+
+    #map{
+      width:100%;
+      height:66vh;
+      min-height:520px;
+      border:1px solid var(--color-borde);
+      border-radius:22px;
+      overflow:hidden;
+      background:#ECE6E2;
+      box-shadow:0 5px 16px rgba(0,0,0,.06);
+    }
+
+    /* Etiquetas visibles sobre cada punto */
+    .map-label{
+      border:none;
+      border-radius:8px;
+      white-space:nowrap;
+      font-weight:700;
+      box-shadow:0 2px 6px rgba(0,0,0,.14);
+    }
+
+    .map-label-hospedaje{
+      background:rgba(255,255,255,.96);
+      color:#242424;
+      padding:5px 8px;
+      font-size:12px;
+    }
+
+    .map-label-ceremonia{
+      background:var(--color-ceremonia);
+      color:#1F2A36;
+      padding:9px 14px;
+      font-size:24px;
+      line-height:1.1;
+      font-weight:800;
+      border-radius:11px;
+      box-shadow:0 3px 10px rgba(0,0,0,.20);
+    }
+
+    .map-label-recepcion{
+      background:var(--color-recepcion);
+      color:#FFFFFF;
+      padding:9px 14px;
+      font-size:24px;
+      line-height:1.1;
+      font-weight:800;
+      border-radius:11px;
+      box-shadow:0 3px 10px rgba(0,0,0,.20);
+    }
+
+    .leaflet-tooltip.map-label-ceremonia:before,
+    .leaflet-tooltip.map-label-recepcion:before,
+    .leaflet-tooltip.map-label-hospedaje:before{
+      display:none;
+    }
+
+    /* Popup */
+    .leaflet-popup-content{
+      margin:12px !important;
+      min-width:230px;
+    }
+
+    .leaflet-popup{
+      z-index:1200 !important;
+    }
+
+    .leaflet-popup-pane{
+      z-index:1200 !important;
+    }
+
+    .popup-card{
+      width:100%;
+    }
+
+    .popup-image{
+      width:100%;
+      height:118px;
+      object-fit:cover;
+      border-radius:12px;
+      display:block;
+      margin:0 0 10px;
+      background:#EFEAE6;
+    }
+
+    .popup-title{
+      color:var(--color-titulo);
+      font-size:16px;
+      line-height:1.2;
+      font-weight:700;
+      margin:0 0 6px;
+    }
+
+    .popup-detail{
+      font-size:13px;
+      line-height:1.45;
+      color:#4A4A4A;
+      margin:0 0 10px;
+    }
+
+    .popup-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .popup-button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 12px;
+      border-radius:10px;
+      background:var(--color-boton);
+      color:#FFFFFF !important;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:700;
+      line-height:1;
+      transition:background .2s ease;
+    }
+
+    .popup-button:hover{
+      background:var(--color-boton-hover);
+    }
+
+    .popup-button.secondary{
+      background:#8C79B5;
+    }
+
+    .popup-button.secondary:hover{
+      background:#7864A3;
+    }
+
+    @media (max-width: 640px){
+      .content{
+        padding:18px 12px 22px;
+      }
+
+      h1{
+        font-size:24px;
+      }
+
+      .legend{
+        gap:12px;
+        font-size:13px;
+      }
+
+      #map{
+        height:68vh;
+        min-height:500px;
+        border-radius:18px;
+      }
+
+      .leaflet-popup-content{
+        min-width:210px;
+      }
+
+      .popup-image{
+        height:106px;
+      }
+
+      .map-label-ceremonia,
+      .map-label-recepcion{
+        font-size:20px;
+        padding:8px 12px;
+      }
+
+      .map-label-hospedaje{
+        font-size:11px;
+        padding:4px 7px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="hero" aria-label="Encabezado Boda Rivas Terán"></div>
+
+    <section class="content">
+      <h1>Ubicaciones</h1>
+
+      <!-- Leyenda arriba del mapa -->
+      <div class="legend" aria-label="Categorías del mapa">
+        <!-- Variante para invitados: sin ceremonia -->
+        <div class="legend-item"><span class="legend-dot recepcion"></span> Recepción</div>
+        <div class="legend-item"><span class="legend-dot hospedaje"></span> Hospedajes</div>
+      </div>
+
+      <div id="map" aria-label="Mapa de ubicaciones"></div>
+    </section>
+  </main>
+
+  <script>
+    /* ============================================================
+       DATOS EDITABLES DEL MAPA
+       ============================================================
+
+       NOTA SOBRE GOOGLE MAPS:
+       - lat/lng siguen siendo necesarios únicamente para colocar el pin en ESTE mapa.
+       - No se usan para la ruta cuando existe googlePlaceId.
+       - Para ruta directa al negocio oficial, completa googlePlaceId.
+       - googleMapsLugar puede ser el enlace oficial corto de Google Maps.
+
+       EN CADA UBICACIÓN PUEDES MODIFICAR:
+
+       nombre          = Nombre visible del lugar
+       lat             = Latitud
+       lng             = Longitud
+       tipo            = "recepcion" | "hospedaje"
+       detalle         = Texto complementario (dirección, nota, referencia, etc.)
+       imagen          = URL o nombre de archivo de la imagen del lugar
+       sitioWeb        = Enlace del botón "Sitio web"
+       googleMapsLugar = Enlace oficial/compartido de Google Maps del lugar
+       googlePlaceId   = SOLO el Place ID oficial de Google, por ejemplo: "ChIJxxxxxxxxxxxx" (sin dirección)
+
+       IMPORTANTE:
+       - Si "imagen" está vacío, no se mostrará imagen en el popup.
+       - Si "sitioWeb" está vacío, no se mostrará el botón "Sitio web".
+       - Si "googlePlaceId" existe, "Cómo llegar" abre la ruta directa al establecimiento oficial.
+       - Si solo existe "googleMapsLugar", se abre la ficha oficial de Google Maps.
+       - Si faltan ambos, se usan lat/lng como último recurso para la ruta.
+
+       Ejemplo:
+       {
+         nombre: "Basílica",
+         lat: -0.215000,
+         lng: -78.500000,
+         tipo: "ceremonia",
+         detalle: "Centro histórico de Quito",
+         imagen: "basilica.jpg",
+         sitioWeb: "https://www.ejemplo.com",
+         googleMapsLugar: "https://maps.app.goo.gl/XXXXXXXXXXXX",
+         googlePlaceId: "ChIJXXXXXXXXXXXX"
+       }
+    */
+
+    const lugares = [
+      {
+        nombre: "Recepción",
+        lat: 0.21985878886778432,
+        lng: -78.22125092698361,  
+        tipo: "recepcion",
+        detalle: "Hosteria Villa Mimi",
+        imagen: "recepción_hosteria-villa-mimi.jpg",
+        sitioWeb: "https://hosteriavillamimi.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/t4Aeo94YiLqBmhwu9",
+        googlePlaceId: "ChIJFVC8KJETKo4RFRfnRoZLA5E"
+      },
+      {
+        nombre: "Hostería Cabañas del Lago",
+        lat: 0.2104962003018956,
+        lng: -78.21081507152952, 
+        tipo: "hospedaje",
+        detalle: "",
+        imagen: "hospedaje_cabana-del-lago.jpg",
+        sitioWeb: "https://cabanasdellago.com.ec/",
+        googleMapsLugar: "https://maps.app.goo.gl/ydgtGhNCWg7Dg9pJ9",
+        googlePlaceId: "ChIJUfcltPoTKo4Ro6cxmGcPbFQ"
+      },
+      {
+        nombre: "Hacienda Cusín",
+        lat: 0.19233357531539888,
+        lng: -78.18740381887851, 
+        tipo: "hospedaje",
+        detalle: "",
+        imagen: "hospedaje_hacienda-cusin.jpg",
+        sitioWeb: "https://www.haciendacusin.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/kVK1FoCDvYkgHsL1A",
+        googlePlaceId: "ChIJWxyLnJYUKo4RLCaLNeFQbKc"
+      },
+      {
+        nombre: "Hostería PuertoLago",
+        lat: 0.20147294641812175,
+        lng: -78.23507666120643,
+        tipo: "hospedaje",  
+        detalle: "",
+        imagen: "hospedaje_puerto-lago.jpg",
+        sitioWeb: "https://www.puertolago.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/SWKqVFBPCSXDHwJi9",
+        googlePlaceId: "ChIJyx5WiJcTKo4ROoVarioxT0Y"
+      },
+      {
+        nombre: "Hotel Otavalo",
+        lat: 0.225165888574998,
+        lng: -78.26290784771456,
+        tipo: "hospedaje",  
+        detalle: "",
+        imagen: "hospedaje_hotel-otavalo.jpg",
+        sitioWeb: "https://hotelotavalo.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/AicHKQnxWUYbmqh48",
+        googlePlaceId: "ChIJw9wZOWcVKo4RQtIEr705-bg"
+      },
+      {
+        nombre: "Hacienda Pinsaquí",
+        lat: 0.27932950259569195,
+        lng: -78.23818856305881,  
+        tipo: "hospedaje",
+        detalle: "",
+        imagen: "hospedaje_Hacienda-Pinsaqui.jpg",
+        sitioWeb: "https://www.haciendapinsaqui.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/MCdu2izUJ6G1uNtMA",
+        googlePlaceId: "ChIJSU-FnJYUKo4RmknYusg6jcc"
+      },
+      {
+        nombre: "Hotel El Indio Inn",
+        lat: 0.22696217354341264,
+        lng: -78.26274160538667,  
+        tipo: "hospedaje",
+        detalle: "",
+        imagen: "hospedaje_Indio-Inn.jpg",
+        sitioWeb: "https://www.hotelelindioinn.com/",
+        googleMapsLugar: "https://maps.app.goo.gl/fTpF7eZwthdfq8ty9",
+        googlePlaceId: "ChIJWxyLnJYUKo4R7ZUSK4N4Yik"
+      },
+      {
+        nombre: "Hotel Medina del Lago",
+        lat: 0.1939396853389929,                       // <-- AGREGAR LATITUD
+        lng: -78.17800031402014,                       // <-- AGREGAR LONGITUD
+        tipo: "hospedaje",
+        detalle: "",                    // <-- OPCIONAL
+        imagen: "hospedaje_Medina-del-lago.jpg",                     // <-- EJEMPLO: hospedaje_hosteria-01.jpg
+        sitioWeb: "https://medinadellago.com/",                   // <-- SITIO WEB OFICIAL
+        googleMapsLugar: "https://maps.app.goo.gl/xR1x8gJmbSfuHXEw8",            // <-- ENLACE OFICIAL/COMPARTIDO DE GOOGLE MAPS
+        googlePlaceId: "ChIJ1deTcW0RKo4RWRQoMAamHUs"               // <-- PLACE ID OFICIAL (OPCIONAL)
+      }
+
+
+
+
+    ];
+
+    /* ============================================================
+       DESDE AQUÍ NO NECESITAS TOCAR NADA
+       ============================================================ */
+
+    const COLORS = {
+      ceremonia: "#9ABEE3",
+      recepcion: "#8C79B5",
+      hospedaje: "#530F1E"
+    };
+
+    const map = L.map("map", {
+      zoomControl: true,
+      attributionControl: true,
+      scrollWheelZoom: true
+    });
+
+    // OpenFreeMap con MapLibre (integración correcta)
+    L.maplibreGL({
+      style: "https://tiles.openfreemap.org/styles/liberty"
+    }).addTo(map);
+
+    map.createPane("hospedajePane");
+    map.getPane("hospedajePane").style.zIndex = 450;
+
+    map.createPane("principalPane");
+    map.getPane("principalPane").style.zIndex = 650;
+
+    map.createPane("tooltipHospedajePane");
+    map.getPane("tooltipHospedajePane").style.zIndex = 650;
+    map.getPane("tooltipHospedajePane").style.pointerEvents = "none";
+
+    map.createPane("tooltipPrincipalPane");
+    map.getPane("tooltipPrincipalPane").style.zIndex = 900;
+    map.getPane("tooltipPrincipalPane").style.pointerEvents = "none";
+
+    // Asegura que los popups siempre queden por encima de etiquetas y pines.
+    map.getPane("popupPane").style.zIndex = 1200;
+
+    const bounds = [];
+
+    function buildPopupContent(lugar){
+      const imageHtml = lugar.imagen
+        ? `<img class="popup-image" src="${lugar.imagen}" alt="${lugar.nombre}">`
+        : "";
+
+      const detailHtml = lugar.detalle
+        ? `<p class="popup-detail">${lugar.detalle}</p>`
+        : "";
+
+      const websiteButton = lugar.sitioWeb
+        ? `<a class="popup-button" href="${lugar.sitioWeb}" target="_blank" rel="noopener noreferrer">Sitio web</a>`
+        : "";
+
+      /*
+        DESTINO EN GOOGLE MAPS
+        1) googlePlaceId: abre DIRECCIONES al establecimiento oficial.
+        2) googleMapsLugar: abre la FICHA oficial del lugar.
+        3) Sin los anteriores: usa lat/lng como ruta de respaldo.
+
+        Importante: un enlace corto maps.app.goo.gl identifica el lugar,
+        pero por sí solo no contiene un Place ID utilizable por la API
+        de URLs de Google Maps para forzar la pantalla de direcciones.
+      */
+      let mapsButton = "";
+
+      if (lugar.googlePlaceId) {
+        /*
+          Acepta únicamente la parte real del Place ID.
+          Si accidentalmente se pegó "ChIJ... dirección...", conserva solo "ChIJ...".
+        */
+        const placeIdLimpio = String(lugar.googlePlaceId).trim().split(/\\s+/)[0];
+
+        const directionsUrl =
+          `https://www.google.com/maps/dir/?api=1` +
+          `&destination=${encodeURIComponent(lugar.nombre)}` +
+          `&destination_place_id=${encodeURIComponent(placeIdLimpio)}`;
+
+        mapsButton =
+          `<a class="popup-button secondary" href="${directionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
+
+      } else if (lugar.googleMapsLugar) {
+        mapsButton =
+          `<a class="popup-button secondary" href="${lugar.googleMapsLugar}" target="_blank" rel="noopener noreferrer">Ver en Google Maps</a>`;
+
+      } else if (Number.isFinite(Number(lugar.lat)) && Number.isFinite(Number(lugar.lng))) {
+        const fallbackDirectionsUrl =
+          `https://www.google.com/maps/dir/?api=1` +
+          `&destination=${encodeURIComponent(`${lugar.lat},${lugar.lng}`)}`;
+
+        mapsButton =
+          `<a class="popup-button secondary" href="${fallbackDirectionsUrl}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>`;
+      }
+
+      const actionsHtml = (websiteButton || mapsButton)
+        ? `<div class="popup-actions">${websiteButton}${mapsButton}</div>`
+        : "";
+
+      return `
+        <div class="popup-card">
+          ${imageHtml}
+          <div class="popup-title">${lugar.nombre}</div>
+          ${detailHtml}
+          ${actionsHtml}
+        </div>
+      `;
+    }
+
+    lugares.forEach((lugar) => {
+      // Si todavía no has ingresado coordenadas, el lugar queda guardado
+      // en el HTML pero no se dibuja en el mapa hasta completarlas.
+      const tieneCoordenadas =
+        lugar.lat !== null && lugar.lat !== "" &&
+        lugar.lng !== null && lugar.lng !== "" &&
+        Number.isFinite(Number(lugar.lat)) &&
+        Number.isFinite(Number(lugar.lng));
+
+      if (!tieneCoordenadas) return;
+
+      const esPrincipal = lugar.tipo === "ceremonia" || lugar.tipo === "recepcion";
+
+      const marker = L.circleMarker([Number(lugar.lat), Number(lugar.lng)], {
+        pane: esPrincipal ? "principalPane" : "hospedajePane",
+        radius: esPrincipal ? 11 : 9,
+        color: "#FFFFFF",
+        weight: esPrincipal ? 3 : 2,
+        fillColor: COLORS[lugar.tipo] || "#530F1E",
+        fillOpacity: 1
+      }).addTo(map);
+
+      const claseEtiqueta =
+        lugar.tipo === "ceremonia"
+          ? "map-label map-label-ceremonia"
+          : lugar.tipo === "recepcion"
+            ? "map-label map-label-recepcion"
+            : "map-label map-label-hospedaje";
+
+      marker.bindTooltip(lugar.nombre, {
+        permanent: true,
+        direction: "top",
+        offset: esPrincipal ? [0, -16] : [0, -12],
+        className: claseEtiqueta,
+        pane: esPrincipal ? "tooltipPrincipalPane" : "tooltipHospedajePane"
+      });
+
+      marker.bindPopup(buildPopupContent(lugar), {
+        maxWidth: 280
+      });
+
+      bounds.push([lugar.lat, lugar.lng]);
+    });
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, {
+        padding: [36, 36],
+        maxZoom: 13
+      });
+    } else {
+      map.setView([0.23, -78.26], 11);
+    }
+  </script>
+</body>
+</html>
