@@ -156,6 +156,14 @@
       display:none;
     }
 
+    .leaflet-tooltip.map-label{
+      cursor:pointer;
+      pointer-events:auto !important;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:manipulation;
+    }
+
     /* Popup */
     .leaflet-popup-content{
       margin:12px !important;
@@ -459,11 +467,11 @@
 
     map.createPane("tooltipHospedajePane");
     map.getPane("tooltipHospedajePane").style.zIndex = 650;
-    map.getPane("tooltipHospedajePane").style.pointerEvents = "none";
+    map.getPane("tooltipHospedajePane").style.pointerEvents = "auto";
 
     map.createPane("tooltipPrincipalPane");
     map.getPane("tooltipPrincipalPane").style.zIndex = 900;
-    map.getPane("tooltipPrincipalPane").style.pointerEvents = "none";
+    map.getPane("tooltipPrincipalPane").style.pointerEvents = "auto";
 
     // Asegura que los popups siempre queden por encima de etiquetas y pines.
     map.getPane("popupPane").style.zIndex = 1200;
@@ -571,11 +579,46 @@
         direction: "top",
         offset: esPrincipal ? [0, -16] : [0, -12],
         className: claseEtiqueta,
-        pane: esPrincipal ? "tooltipPrincipalPane" : "tooltipHospedajePane"
+        pane: esPrincipal ? "tooltipPrincipalPane" : "tooltipHospedajePane",
+        interactive: true
       });
 
       marker.bindPopup(buildPopupContent(lugar), {
         maxWidth: 280
+      });
+
+      /*
+        La etiqueta visible también funciona como botón.
+        Permite abrir el popup tocando directamente el nombre
+        de Fiesta o de cualquiera de los hospedajes.
+      */
+      marker.on("tooltipopen", function () {
+        const tooltip = marker.getTooltip();
+        const el = tooltip && tooltip.getElement ? tooltip.getElement() : null;
+
+        if (!el || el.dataset.popupClickReady === "1") return;
+
+        el.dataset.popupClickReady = "1";
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("aria-label", `Abrir información de ${lugar.nombre}`);
+
+        const abrirPopup = function (event) {
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          marker.openPopup();
+        };
+
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.on(el, "click", abrirPopup);
+        L.DomEvent.on(el, "touchend", abrirPopup);
+        L.DomEvent.on(el, "keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            abrirPopup(event);
+          }
+        });
       });
 
       bounds.push([lugar.lat, lugar.lng]);
