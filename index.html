@@ -156,6 +156,14 @@
       display:none;
     }
 
+    .leaflet-tooltip.map-label{
+      cursor:pointer;
+      pointer-events:auto !important;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:manipulation;
+    }
+
     /* Popup */
     .leaflet-popup-content{
       margin:12px !important;
@@ -338,14 +346,14 @@
     const lugares = [
       {
         nombre: "Ceremonia",
-        lat: 0.2153140613540771,                 // <-- CAMBIAR LATITUD
-        lng: -78.21097815249018,                // <-- CAMBIAR LONGITUD
+        lat: 0.22108277833310547,                 // <-- CAMBIAR LATITUD    
+        lng: -78.22250895816427,                // <-- CAMBIAR LONGITUD
         tipo: "ceremonia",
-        detalle: "Capilla Católica Nuestra Señora de La Merced | Camuendo",                   // <-- OPCIONAL: dirección o información complementaria
+        detalle: "Parroquia Sagrado Corazón de Jesús | La Compañía", // <-- OPCIONAL: dirección o información complementaria
         imagen: "ceremonia_iglesia.jpg",                    // <-- OPCIONAL: imagen del lugar
         sitioWeb: "",                  // <-- OPCIONAL: sitio web oficial
-        googleMapsLugar: "https://maps.app.goo.gl/48dA4XWfeN6auj636",
-        googlePlaceId: "ChIJQQdXBwATKo4RypZrYVF5DcY"              // <-- OPCIONAL: enlace de Google Maps
+        googleMapsLugar: "https://maps.app.goo.gl/97WAdVwww53EhaYu9",
+        googlePlaceId: "ChIJcTgmDqIVKo4RxuHX5tdfJtA"              // <-- OPCIONAL: enlace de Google Maps
       },
       {
         nombre: "Recepción",
@@ -470,11 +478,11 @@
 
     map.createPane("tooltipHospedajePane");
     map.getPane("tooltipHospedajePane").style.zIndex = 650;
-    map.getPane("tooltipHospedajePane").style.pointerEvents = "none";
+    map.getPane("tooltipHospedajePane").style.pointerEvents = "auto";
 
     map.createPane("tooltipPrincipalPane");
     map.getPane("tooltipPrincipalPane").style.zIndex = 900;
-    map.getPane("tooltipPrincipalPane").style.pointerEvents = "none";
+    map.getPane("tooltipPrincipalPane").style.pointerEvents = "auto";
 
     // Asegura que los popups siempre queden por encima de etiquetas y pines.
     map.getPane("popupPane").style.zIndex = 1200;
@@ -582,11 +590,41 @@
         direction: "top",
         offset: esPrincipal ? [0, -16] : [0, -12],
         className: claseEtiqueta,
-        pane: esPrincipal ? "tooltipPrincipalPane" : "tooltipHospedajePane"
+        pane: esPrincipal ? "tooltipPrincipalPane" : "tooltipHospedajePane",
+        interactive: true
       });
 
       marker.bindPopup(buildPopupContent(lugar), {
         maxWidth: 280
+      });
+
+      marker.on("tooltipopen", function () {
+        const tooltip = marker.getTooltip();
+        const el = tooltip && tooltip.getElement ? tooltip.getElement() : null;
+
+        if (!el || el.dataset.popupClickReady === "1") return;
+
+        el.dataset.popupClickReady = "1";
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("aria-label", `Abrir información de ${lugar.nombre}`);
+
+        const abrirPopup = function (event) {
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          marker.openPopup();
+        };
+
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.on(el, "click", abrirPopup);
+        L.DomEvent.on(el, "touchend", abrirPopup);
+        L.DomEvent.on(el, "keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            abrirPopup(event);
+          }
+        });
       });
 
       bounds.push([lugar.lat, lugar.lng]);
